@@ -39,7 +39,7 @@ export default function ProtectedLayout({
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="flex-1 flex min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <Sidebar />
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
