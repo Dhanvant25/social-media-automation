@@ -1,40 +1,50 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Sparkles, Send } from "lucide-react"
-import { PlatformSelector } from "./platform-selector"
-import { AIImageGenerator } from "./ai-image-generator"
-import { DateTimePicker } from "./date-time-picker"
-import { toast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Sparkles, Send } from "lucide-react";
+import { PlatformSelector } from "./platform-selector";
+import { AIImageGenerator } from "./ai-image-generator";
+import { DateTimePicker } from "./date-time-picker";
+import { toast } from "@/components/ui/use-toast";
+import { getPosts, createPost } from "@/lib/posts";
+import { useAuth } from "@/lib/auth-context";
 
 export function PostCreator() {
-  const [content, setContent] = useState("")
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
-  const [scheduledTime, setScheduledTime] = useState<Date>()
-  const [showAIGenerator, setShowAIGenerator] = useState(false)
-  const [generatedImage, setGeneratedImage] = useState<string>()
+  const [content, setContent] = useState("");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [scheduledTime, setScheduledTime] = useState<Date>();
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string>();
+  const { user } = useAuth();
 
   useEffect(() => {
     // Check for selected AI image from studio
-    const selectedImage = localStorage.getItem("selectedAIImage")
+    const selectedImage = localStorage.getItem("selectedAIImage");
     if (selectedImage) {
       try {
-        const imageData = JSON.parse(selectedImage)
-        setGeneratedImage(imageData.url)
-        localStorage.removeItem("selectedAIImage") // Clean up
+        const imageData = JSON.parse(selectedImage);
+        setGeneratedImage(imageData.url);
+        localStorage.removeItem("selectedAIImage"); // Clean up
         toast({
           title: "Image Loaded",
           description: "AI generated image loaded from studio",
-        })
+        });
       } catch (error) {
-        console.error("Failed to load selected image:", error)
+        console.error("Failed to load selected image:", error);
       }
     }
-  }, [])
+
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    const posts = await getPosts();
+    console.log("Posts:", posts);
+  };
 
   const handleSubmit = async () => {
     // Handle post creation logic here
@@ -43,8 +53,16 @@ export function PostCreator() {
       platforms: selectedPlatforms,
       scheduledTime,
       imageUrl: generatedImage,
-    })
-  }
+    });
+
+    await createPost(
+      content,
+      selectedPlatforms,
+      scheduledTime,
+      generatedImage,
+      user?.id
+    );
+  };
 
   return (
     <Card className="bg-slate-800/50 border-purple-800/50 backdrop-blur-sm">
@@ -66,10 +84,15 @@ export function PostCreator() {
             onChange={(e) => setContent(e.target.value)}
             className="bg-slate-700/50 border-purple-700/50 text-white placeholder:text-purple-400 min-h-[100px]"
           />
-          <div className="text-xs text-purple-400 mt-1">{content.length}/280 characters</div>
+          <div className="text-xs text-purple-400 mt-1">
+            {content.length}/280 characters
+          </div>
         </div>
 
-        <PlatformSelector selected={selectedPlatforms} onChange={setSelectedPlatforms} />
+        <PlatformSelector
+          selected={selectedPlatforms}
+          onChange={setSelectedPlatforms}
+        />
 
         <DateTimePicker value={scheduledTime} onChange={setScheduledTime} />
 
@@ -87,7 +110,9 @@ export function PostCreator() {
             </Button>
           </div>
 
-          {showAIGenerator && <AIImageGenerator onImageGenerated={setGeneratedImage} />}
+          {showAIGenerator && (
+            <AIImageGenerator onImageGenerated={setGeneratedImage} />
+          )}
 
           {generatedImage && (
             <div className="relative">
@@ -118,5 +143,5 @@ export function PostCreator() {
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
