@@ -82,13 +82,18 @@ export default function ScheduledPosts() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  const fetchPosts = async (query: string = "") => {
-    setLoading(true);
-    const posts = await getPosts(query);
-    setLoading(false);
+  const fetchPosts = async (query: string = "", platformId: string = "") => {
+    try {
+      setLoading(true);
+      const posts = await getPosts(query, platformId);
 
-    if (posts) {
-      setScheduledPosts(posts);
+      if (posts) {
+        setScheduledPosts(posts);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -127,6 +132,10 @@ export default function ScheduledPosts() {
   const handleEditPost = async (id: string) => {
     router.push(`/?id=${id}`);
   };
+
+  useEffect(() => {
+    fetchPosts(searchTerm, platformFilter === "all" ? "" : platformFilter);
+  }, [platformFilter]);
 
   return (
     <div className="p-6 space-y-6">
@@ -171,10 +180,15 @@ export default function ScheduledPosts() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Platforms</SelectItem>
-                <SelectItem value="twitter">Twitter</SelectItem>
+                {/* <SelectItem value="twitter">Twitter</SelectItem>
                 <SelectItem value="instagram">Instagram</SelectItem>
                 <SelectItem value="linkedin">LinkedIn</SelectItem>
-                <SelectItem value="facebook">Facebook</SelectItem>
+                <SelectItem value="facebook">Facebook</SelectItem> */}
+                {platforms.map((platform) => (
+                  <SelectItem key={platform.id} value={platform.id}>
+                    {platform.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

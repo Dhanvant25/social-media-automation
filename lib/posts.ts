@@ -35,12 +35,18 @@ export async function getPlatforms() {
 }
 
 // Fetch all posts
-export async function getPosts(query: string) {
-  const { data, error } = await supabase
+export async function getPosts(query: string, platformId?: string) {
+  let queryBuilder = supabase
     .from("posts")
     .select("*")
     .ilike("content", `%${query}%`)
     .order("created_at", { ascending: false });
+
+  if (platformId) {
+    // queryBuilder = queryBuilder.contains("platforms", platformId);
+  }
+
+  const { data, error } = await queryBuilder;
 
   if (error) throw error;
   return data;
