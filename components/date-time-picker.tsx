@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CalendarIcon, Clock } from "lucide-react"
 import { format } from "date-fns"
+import { useSearchParams } from "next/navigation"
 
 interface DateTimePickerProps {
   value?: Date
@@ -14,6 +15,7 @@ interface DateTimePickerProps {
 
 export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   const [showScheduler, setShowScheduler] = useState(false)
+  const searchParams = useSearchParams();
 
   const handleDateChange = (dateStr: string) => {
     if (dateStr) {
@@ -23,6 +25,13 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
       onChange(undefined)
     }
   }
+
+  useEffect(() => {
+    const postId = searchParams.get("id");
+    if (postId) {
+      setShowScheduler(true);
+    }
+  }, [searchParams]);
 
   const handleTimeChange = (timeStr: string) => {
     if (value && timeStr) {

@@ -46,6 +46,18 @@ export async function getPosts(query: string) {
   return data;
 }
 
+//  Get post by id
+export async function getPostById(id: string) {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("uuid", id)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 //  Create new post
 export async function createPost(
   content: string,
@@ -74,13 +86,33 @@ export async function createPost(
   return data;
 }
 
-// Delete post
-export async function deletePost(id: string) {
-  const { error } = await supabase
+// Update post
+export async function updatePost(
+  id: string,
+  content: string,
+  platforms: string,
+  scheduledTime: Date,
+  imageUrl: string,
+  tags: string
+) {
+  const { data, error } = await supabase
     .from("posts")
-    .delete()
+    .update({
+      content,
+      platforms,
+      scheduledTime,
+      imageUrl,
+      tags,
+    })
     .eq("uuid", id);
 
   if (error) throw error;
+  return data;
 }
 
+// Delete post
+export async function deletePost(id: string) {
+  const { error } = await supabase.from("posts").delete().eq("uuid", id);
+
+  if (error) throw error;
+}

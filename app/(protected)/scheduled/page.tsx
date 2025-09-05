@@ -22,6 +22,7 @@ import {
 import { getPosts, getPlatforms, deletePost } from "@/lib/posts";
 import moment from "moment";
 import { debounce } from "@/utils/debounce";
+import { useRouter } from "next/navigation";
 
 const scheduledPosts1 = [
   {
@@ -79,6 +80,7 @@ export default function ScheduledPosts() {
   const [scheduledPosts, setScheduledPosts] = useState<Post[]>([]);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchPosts = async (query: string = "") => {
     setLoading(true);
@@ -108,18 +110,22 @@ export default function ScheduledPosts() {
     fetchPlatforms();
   }, []);
 
-
-
-  const handleSearch = useMemo(() =>
-    debounce((value: string) => {
-      fetchPosts(value);
-    }, 500),
-  []);
+  const handleSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        fetchPosts(value);
+      }, 500),
+    []
+  );
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    handleSearch(value); 
+    handleSearch(value);
+  };
+
+  const handleEditPost = async (id: string) => {
+    router.push(`/?id=${id}`);
   };
 
   return (
@@ -178,7 +184,9 @@ export default function ScheduledPosts() {
       {loading ? (
         <div className="flex items-center justify-center h-64">Loading...</div>
       ) : scheduledPosts.length === 0 ? (
-        <div className="flex items-center justify-center h-64">No posts found</div>
+        <div className="flex items-center justify-center h-64">
+          No posts found
+        </div>
       ) : (
         <>
           {/* Posts List */}
@@ -242,7 +250,7 @@ export default function ScheduledPosts() {
                             <Calendar className="h-4 w-4 mr-2" />
                             {/* {post.scheduledTime.toLocaleString()} */}
                             {moment(post.scheduledTime).format(
-                              "DD/MM/YYYY, HH:mm:ss A"
+                              "DD/MM/YYYY, hh:mm:ss A"
                             )}
                           </div>
                         </div>
@@ -257,7 +265,9 @@ export default function ScheduledPosts() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleEditPost(post.uuid)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Post
                             </DropdownMenuItem>

@@ -11,11 +11,13 @@ import { PlatformSelector } from "./platform-selector";
 import { AIImageGenerator } from "./ai-image-generator";
 import { DateTimePicker } from "./date-time-picker";
 import { toast } from "@/components/ui/use-toast";
-import { getTags, createPost } from "@/lib/posts";
+import { getTags, createPost, getPostById, updatePost } from "@/lib/posts";
 import { useAuth } from "@/lib/auth-context";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface Tag {
-  id: number;
+  id: string | number;
   name: string;
   created_at?: string;
 }
@@ -26,11 +28,9 @@ export function PostCreator() {
   const [scheduledTime, setScheduledTime] = useState<Date>();
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>();
-  interface Tag {
-    id: number;
-    name: string;
-    created_at?: string;
-  }
+  const [isEdit, setIsEdit] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -57,10 +57,10 @@ export function PostCreator() {
   }, []);
 
   const fetchTags = async () => {
-    const tags = await getTags();
+    const res = await getTags();
 
-    if (tags) {
-      setTags(tags);
+    if (res) {
+      setTags(res);
     }
   };
 
@@ -79,27 +79,54 @@ export function PostCreator() {
       const postScheduledTime = scheduledTime || new Date();
       const tagIds = selectedTags.map((tag) => tag.id);
 
-      console.log({
+      const payload = {
         content,
         platforms: selectedPlatforms.join(","),
         scheduledTime: postScheduledTime,
+        imageUrl: generatedImage || "",
+        userId: user.id,
         tags: tagIds.join(","),
-        imageUrl: generatedImage,
-      });
+      };
 
-      const post = await createPost(
-        content,
-        selectedPlatforms.join(","),
-        postScheduledTime,
-        generatedImage || "",
-        user.id,
-        tagIds.join(",")
-      );
+      let post;
+      if (isEdit) {
+        post = await updatePost(
+          searchParams?.get("id") || "",
+          payload.content,
+          payload.platforms,
+          new Date(payload.scheduledTime),
+          payload.imageUrl,
+          payload.tags
+        );
+      } else {
+        post = await createPost(
+          payload.content,
+          payload.platforms,
+          new Date(payload.scheduledTime),
+          payload.imageUrl,
+          payload.userId,
+          payload.tags
+        );
+      }
+
+      // const post = await createPost(
+      //   content,
+      //   selectedPlatforms.join(","),
+      //   postScheduledTime,
+      //   generatedImage || "",
+      //   user.id,
+      //   tagIds.join(",")
+      // );
+
+      if (isEdit) {
+        router.push(`/scheduled`);
+        setIsEdit(false);
+      }
 
       if (post) {
         toast({
           title: "Success",
-          description: "Post created successfully!",
+          description: `Post ${isEdit ? "updated" : "created"} successfully!`,
         });
 
         // Reset form
@@ -118,6 +145,32 @@ export function PostCreator() {
       });
     }
   };
+
+  const fetchPostById = async (id: string) => {
+    const post = await getPostById(id);
+
+    if (post) {
+      setContent(post.content);
+      setSelectedPlatforms(post.platforms.split(",").map(Number));
+      setSelectedTags(
+        post.tags
+          .split(",")
+          .map((id: string) => tags.find((tag) => tag.id == id))
+      );
+      setScheduledTime(new Date(post.scheduledTime));
+      setGeneratedImage(post.imageUrl);
+    }
+  };
+
+  useEffect(() => {
+    const postId = searchParams.get("id");
+
+    if (postId) {
+      setIsEdit(true);
+      // fetchTags().then(() => fetchPostById(postId));
+      fetchPostById(postId);
+    }
+  }, [searchParams, tags]);
 
   return (
     <Card className="bg-slate-800/50 border-purple-800/50 backdrop-blur-sm">

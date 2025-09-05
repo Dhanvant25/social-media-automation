@@ -49,7 +49,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
           onValueChange([...value, newTag]);
         }
       } else {
-        if (item && !value.some((tag) => tag.id === item.id)) {
+        if (item && !value.some((tag) => tag?.id === item?.id)) {
           onValueChange([...value, item]);
         }
       }
@@ -58,7 +58,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     };
 
     const handleRemoveItem = (itemToRemove: Tag) => {
-      onValueChange(value.filter((item) => item.id !== itemToRemove.id));
+      onValueChange(value.filter((item) => item?.id !== itemToRemove?.id));
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -77,7 +77,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
     const filteredOptions = options.filter(
       (option) =>
-        !value.some((selected) => selected.id === option.id) &&
+        !value.some((selected) => selected?.id === option.id) &&
         option.name.toLowerCase().includes(inputValue.toLowerCase())
     );
 
@@ -93,11 +93,11 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
         >
           {value.map((item) => (
             <Badge
-              key={item.id}
+              key={item?.id}
               variant="secondary"
               className="flex items-center gap-1.5 bg-background border-purple-700/50 text-white"
             >
-              {item.name}
+              {item?.name}
               <button
                 type="button"
                 className="ml-1.5 h-4 w-4 rounded-full flex items-center justify-center hover:bg-slate-600/50"
