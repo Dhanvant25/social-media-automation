@@ -35,10 +35,11 @@ export async function getPlatforms() {
 }
 
 // Fetch all posts
-export async function getPosts() {
+export async function getPosts(query: string) {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
+    .ilike("content", `%${query}%`)
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -72,3 +73,14 @@ export async function createPost(
   if (error) throw error;
   return data;
 }
+
+// Delete post
+export async function deletePost(id: string) {
+  const { error } = await supabase
+    .from("posts")
+    .delete()
+    .eq("uuid", id);
+
+  if (error) throw error;
+}
+

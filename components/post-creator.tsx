@@ -11,7 +11,7 @@ import { PlatformSelector } from "./platform-selector";
 import { AIImageGenerator } from "./ai-image-generator";
 import { DateTimePicker } from "./date-time-picker";
 import { toast } from "@/components/ui/use-toast";
-import { getTags, getPlatforms, getPosts, createPost } from "@/lib/posts";
+import { getTags, createPost } from "@/lib/posts";
 import { useAuth } from "@/lib/auth-context";
 
 interface Tag {
@@ -53,14 +53,8 @@ export function PostCreator() {
       }
     }
 
-    fetchPosts();
     fetchTags();
   }, []);
-
-  const fetchPosts = async () => {
-    const posts = await getPosts();
-    console.log("Posts:", posts);
-  };
 
   const fetchTags = async () => {
     const tags = await getTags();

@@ -85,8 +85,8 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       <div className={cn("relative w-full", className)} ref={ref} {...props}>
         <div
           className={cn(
-            "flex flex-wrap gap-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+            "flex flex-wrap gap-2 w-full rounded-md border border-input bg-slate-700/50 px-3 py-2 text-sm ring-offset-background",
+            "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 border-purple-700/50",
             "min-h-10"
           )}
           onClick={() => inputRef.current?.focus()}
@@ -95,7 +95,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
             <Badge
               key={item.id}
               variant="secondary"
-              className="flex items-center gap-1.5 bg-slate-700/50 border-purple-700/50 text-white"
+              className="flex items-center gap-1.5 bg-background border-purple-700/50 text-white"
             >
               {item.name}
               <button
@@ -126,7 +126,7 @@ const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
 
         {isOpen &&
           (filteredOptions.length > 0 || (creatable && inputValue)) && (
-            <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
+            <div className="absolute z-10 mt-1 w-full rounded-md border bg-slate-700 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95">
               <div className="p-1 max-h-48 overflow-auto">
                 {filteredOptions.map((option) => (
                   <div
