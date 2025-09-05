@@ -4,14 +4,21 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Send } from "lucide-react";
 import { PlatformSelector } from "./platform-selector";
 import { AIImageGenerator } from "./ai-image-generator";
 import { DateTimePicker } from "./date-time-picker";
 import { toast } from "@/components/ui/use-toast";
-import { getPosts, createPost } from "@/lib/posts";
+import { getTags, getPlatforms, getPosts, createPost } from "@/lib/posts";
 import { useAuth } from "@/lib/auth-context";
+
+interface Tag {
+  id: number;
+  name: string;
+  created_at?: string;
+}
 
 export function PostCreator() {
   const [content, setContent] = useState("");
@@ -19,6 +26,14 @@ export function PostCreator() {
   const [scheduledTime, setScheduledTime] = useState<Date>();
   const [showAIGenerator, setShowAIGenerator] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string>();
+  interface Tag {
+    id: number;
+    name: string;
+    created_at?: string;
+  }
+
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -39,6 +54,7 @@ export function PostCreator() {
     }
 
     fetchPosts();
+    fetchTags();
   }, []);
 
   const fetchPosts = async () => {
@@ -46,22 +62,67 @@ export function PostCreator() {
     console.log("Posts:", posts);
   };
 
-  const handleSubmit = async () => {
-    // Handle post creation logic here
-    console.log({
-      content,
-      platforms: selectedPlatforms,
-      scheduledTime,
-      imageUrl: generatedImage,
-    });
+  const fetchTags = async () => {
+    const tags = await getTags();
 
-    await createPost(
-      content,
-      selectedPlatforms,
-      scheduledTime,
-      generatedImage,
-      user?.id
-    );
+    if (tags) {
+      setTags(tags);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a post",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Use current time if no scheduled time is set
+      const postScheduledTime = scheduledTime || new Date();
+      const tagIds = selectedTags.map((tag) => tag.id);
+
+      console.log({
+        content,
+        platforms: selectedPlatforms.join(","),
+        scheduledTime: postScheduledTime,
+        tags: tagIds.join(","),
+        imageUrl: generatedImage,
+      });
+
+      const post = await createPost(
+        content,
+        selectedPlatforms.join(","),
+        postScheduledTime,
+        generatedImage || "",
+        user.id,
+        tagIds.join(",")
+      );
+
+      if (post) {
+        toast({
+          title: "Success",
+          description: "Post created successfully!",
+        });
+
+        // Reset form
+        setContent("");
+        setSelectedPlatforms([]);
+        setSelectedTags([]);
+        setScheduledTime(undefined);
+        setGeneratedImage(undefined);
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -87,6 +148,25 @@ export function PostCreator() {
           <div className="text-xs text-purple-400 mt-1">
             {content.length}/280 characters
           </div>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-2">
+          <Label htmlFor="tags" className="text-purple-300">
+            Tags
+          </Label>
+          <MultiSelect
+            id="tags"
+            placeholder="Select tags"
+            value={selectedTags}
+            onValueChange={setSelectedTags}
+            options={tags}
+            creatable
+            className="bg-slate-700/50 border-purple-700/50 text-white placeholder:text-purple-400"
+          />
+          <p className="text-xs text-muted-foreground">
+            Type and press Enter to add new tags
+          </p>
         </div>
 
         <PlatformSelector
@@ -136,7 +216,9 @@ export function PostCreator() {
         <Button
           onClick={handleSubmit}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-          disabled={!content || selectedPlatforms.length === 0}
+          disabled={
+            !content || selectedPlatforms.length === 0 || !scheduledTime
+          }
         >
           <Send className="h-4 w-4 mr-2" />
           Schedule Post
