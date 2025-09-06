@@ -1,39 +1,54 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useAuth } from "@/lib/auth-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Mail, Lock, User, UserPlus, Sparkles, CheckCircle } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  UserPlus,
+  Sparkles,
+  CheckCircle,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createUser } from "@/lib/users";
+
+type SignUpResult = {
+  data: any | null;
+  error: any | null;
+};
 
 export default function RegisterPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState(false)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const { signUp } = useAuth()
-  const router = useRouter()
+  const { signUp } = useAuth();
+  const router = useRouter();
 
   const validatePassword = (password: string) => {
-    const minLength = password.length >= 8
-    const hasUpper = /[A-Z]/.test(password)
-    const hasLower = /[a-z]/.test(password)
-    const hasNumber = /\d/.test(password)
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    const minLength = password.length >= 8;
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     return {
       minLength,
@@ -42,38 +57,54 @@ export default function RegisterPage() {
       hasNumber,
       hasSpecial,
       isValid: minLength && hasUpper && hasLower && hasNumber && hasSpecial,
-    }
-  }
+    };
+  };
 
-  const passwordValidation = validatePassword(password)
+  const passwordValidation = validatePassword(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setLoading(false)
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     if (!passwordValidation.isValid) {
-      setError("Password does not meet requirements")
-      setLoading(false)
-      return
+      setError("Password does not meet requirements");
+      setLoading(false);
+      return;
     }
 
-    const { error } = await signUp(email, password, name)
+    const { data, error } = (await signUp(
+      email,
+      password,
+      name
+    )) as SignUpResult;
 
     if (error) {
-      setError(error.message)
+      setError(error.message);
     } else {
-      setSuccess(true)
+      setSuccess(true);
+
+      const { user } = data;
+
+      if (user) {
+        const { data, error } = await createUser(
+          user.id,
+          user.email,
+          user.user_metadata.name,
+          user.phone || "",
+          user.role || "user"
+        );
+      }
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   if (success) {
     return (
@@ -85,8 +116,9 @@ export default function RegisterPage() {
             </div>
             <h2 className="text-2xl font-bold text-white">Check Your Email</h2>
             <p className="text-purple-300">
-              We've sent you a confirmation link at <strong>{email}</strong>. Please check your email and click the link
-              to activate your account.
+              We've sent you a confirmation link at <strong>{email}</strong>.
+              Please check your email and click the link to activate your
+              account.
             </p>
             <Button
               onClick={() => router.push("/auth/login")}
@@ -97,7 +129,7 @@ export default function RegisterPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -118,8 +150,12 @@ export default function RegisterPage() {
 
         <Card className="bg-slate-800/50 border-purple-800/50 backdrop-blur-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-white">Create Account</CardTitle>
-            <p className="text-center text-purple-300">Join SocialAI and automate your social media</p>
+            <CardTitle className="text-2xl font-bold text-center text-white">
+              Create Account
+            </CardTitle>
+            <p className="text-center text-purple-300">
+              Join SocialAI and automate your social media
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             {error && (
@@ -185,7 +221,11 @@ export default function RegisterPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-300"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
 
@@ -193,42 +233,82 @@ export default function RegisterPage() {
                 {password && (
                   <div className="space-y-1 text-xs">
                     <div
-                      className={`flex items-center space-x-2 ${passwordValidation.minLength ? "text-green-400" : "text-red-400"}`}
+                      className={`flex items-center space-x-2 ${
+                        passwordValidation.minLength
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${passwordValidation.minLength ? "bg-green-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${
+                          passwordValidation.minLength
+                            ? "bg-green-400"
+                            : "bg-red-400"
+                        }`}
                       />
                       <span>At least 8 characters</span>
                     </div>
                     <div
-                      className={`flex items-center space-x-2 ${passwordValidation.hasUpper ? "text-green-400" : "text-red-400"}`}
+                      className={`flex items-center space-x-2 ${
+                        passwordValidation.hasUpper
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${passwordValidation.hasUpper ? "bg-green-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${
+                          passwordValidation.hasUpper
+                            ? "bg-green-400"
+                            : "bg-red-400"
+                        }`}
                       />
                       <span>One uppercase letter</span>
                     </div>
                     <div
-                      className={`flex items-center space-x-2 ${passwordValidation.hasLower ? "text-green-400" : "text-red-400"}`}
+                      className={`flex items-center space-x-2 ${
+                        passwordValidation.hasLower
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${passwordValidation.hasLower ? "bg-green-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${
+                          passwordValidation.hasLower
+                            ? "bg-green-400"
+                            : "bg-red-400"
+                        }`}
                       />
                       <span>One lowercase letter</span>
                     </div>
                     <div
-                      className={`flex items-center space-x-2 ${passwordValidation.hasNumber ? "text-green-400" : "text-red-400"}`}
+                      className={`flex items-center space-x-2 ${
+                        passwordValidation.hasNumber
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${passwordValidation.hasNumber ? "bg-green-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${
+                          passwordValidation.hasNumber
+                            ? "bg-green-400"
+                            : "bg-red-400"
+                        }`}
                       />
                       <span>One number</span>
                     </div>
                     <div
-                      className={`flex items-center space-x-2 ${passwordValidation.hasSpecial ? "text-green-400" : "text-red-400"}`}
+                      className={`flex items-center space-x-2 ${
+                        passwordValidation.hasSpecial
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }`}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full ${passwordValidation.hasSpecial ? "bg-green-400" : "bg-red-400"}`}
+                        className={`w-2 h-2 rounded-full ${
+                          passwordValidation.hasSpecial
+                            ? "bg-green-400"
+                            : "bg-red-400"
+                        }`}
                       />
                       <span>One special character</span>
                     </div>
@@ -256,7 +336,11 @@ export default function RegisterPage() {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400 hover:text-purple-300"
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
@@ -266,7 +350,11 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                disabled={loading || !passwordValidation.isValid || password !== confirmPassword}
+                disabled={
+                  loading ||
+                  !passwordValidation.isValid ||
+                  password !== confirmPassword
+                }
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium py-2.5"
               >
                 {loading ? (
@@ -287,7 +375,10 @@ export default function RegisterPage() {
 
             <div className="text-center text-sm text-purple-300">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-purple-400 hover:text-purple-300 font-medium transition-colors">
+              <Link
+                href="/auth/login"
+                className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+              >
                 Sign in
               </Link>
             </div>
@@ -296,15 +387,21 @@ export default function RegisterPage() {
 
         <div className="text-center text-xs text-purple-400">
           By creating an account, you agree to our{" "}
-          <Link href="/terms" className="hover:text-purple-300 transition-colors">
+          <Link
+            href="/terms"
+            className="hover:text-purple-300 transition-colors"
+          >
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="hover:text-purple-300 transition-colors">
+          <Link
+            href="/privacy"
+            className="hover:text-purple-300 transition-colors"
+          >
             Privacy Policy
           </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }
