@@ -104,7 +104,6 @@ export default function TokensPage() {
         apiUrl: "https://www.instagram.com/oauth/authorize",
         clientId: process.env.NEXT_PUBLIC_IG_APP_ID ?? "",
         redirectUri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI ?? "",
-        // scope: "user_profile,user_media",
         scope:
           "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights",
         responseType: "code",
