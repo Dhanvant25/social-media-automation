@@ -12,7 +12,7 @@ export default function FacebookCallbackPage() {
   const router = useRouter();
 
   const generateFbAccessToken = async (code: string) => {
-    const res = await axios.post(
+    const shortTokenRes = await axios.post(
       "https://graph.facebook.com/v23.0/oauth/access_token",
       {
         client_id: process.env.NEXT_PUBLIC_APP_ID,
@@ -27,8 +27,24 @@ export default function FacebookCallbackPage() {
       }
     );
 
-    if (res.data) {
-      saveSocialMediaTokens("facebook", res.data.access_token);
+    const shortLivedToken = shortTokenRes.data.access_token;
+
+    const longTokenRes = await axios.get(
+      "https://graph.facebook.com/v23.0/oauth/access_token",
+      {
+        params: {
+          grant_type: "fb_exchange_token",
+          client_id: process.env.NEXT_PUBLIC_APP_ID,
+          client_secret: process.env.NEXT_PUBLIC_APP_SECRET,
+          fb_exchange_token: shortLivedToken,
+        },
+      }
+    );
+
+    const longLivedToken = longTokenRes.data.access_token;
+
+    if (longLivedToken) {
+      saveSocialMediaTokens("facebook", longLivedToken, true);
       router.push("/tokens");
     }
   };

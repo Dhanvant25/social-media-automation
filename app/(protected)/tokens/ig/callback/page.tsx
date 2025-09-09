@@ -12,24 +12,41 @@ export default function InstagramCallbackPage() {
   const router = useRouter();
 
   const generateIgAccessToken = async (code: string) => {
-    const res = await axios.post(
+    const shortTokenRes = await axios.post(
       "https://api.instagram.com/oauth/access_token",
+
       {
-        body: JSON.stringify({
-          client_id: process.env.NEXT_PUBLIC_IG_APP_ID,
-          client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
-          grant_type: "authorization_code",
-          redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI,
-          code,
-        }),
+        client_id: process.env.NEXT_PUBLIC_IG_APP_ID,
+        client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
+        grant_type: "authorization_code",
+        redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI,
+        code,
+      },
+      {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
 
-    if (res.data) {
-      saveSocialMediaTokens("instagram", res.data.access_token);
+    const shortLivedToken = shortTokenRes.data.access_token;
+    const userId = shortTokenRes.data.user_id;
+
+    const longTokenRes = await axios.get(
+      "https://graph.instagram.com/access_token",
+      {
+        params: {
+          grant_type: "ig_exchange_token",
+          client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
+          access_token: shortLivedToken,
+        },
+      }
+    );
+
+    const longLivedToken = longTokenRes.data.access_token;
+
+    if (longLivedToken) {
+      saveSocialMediaTokens("instagram", longLivedToken, true);
       router.push("/tokens");
     }
   };
