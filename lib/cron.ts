@@ -10,7 +10,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-cron.schedule("0 9 * * *", async () => {
+cron.schedule("* * * * *", async () => {
   console.log("Checking scheduled posts...");
 
   const now = new Date().toISOString();
