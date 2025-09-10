@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { saveSocialMediaTokens } from "@/lib/social-media";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { getPlatforms } from "@/lib/posts";
+
+interface Platform {
+  id: string;
+  label: string;
+  key: string;
+}
 
 export default function FacebookCallbackPage() {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
   const router = useRouter();
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const generateFbAccessToken = async (code: string) => {
     const shortTokenRes = await axios.post(
@@ -43,17 +51,51 @@ export default function FacebookCallbackPage() {
 
     const longLivedToken = longTokenRes.data.access_token;
 
+    const pageTokenRes = await axios.get(
+      `https://graph.facebook.com/v23.0/me/accounts`,
+      {
+        params: {
+          access_token: longLivedToken,
+        },
+      }
+    );
+
+    const pages = pageTokenRes.data.data;
+    const pageToken = pages[0]?.access_token || null;
+    const pageId = pages[0]?.id || null;
+
     if (longLivedToken) {
-      saveSocialMediaTokens("facebook", longLivedToken, true);
-      router.push("/tokens");
+      const platform = platforms.find((platform) => platform.key == "facebook");
+      if (platform) {
+        saveSocialMediaTokens(
+          platform.id,
+          longLivedToken,
+          pageToken,
+          pageId,
+          true
+        );
+        router.push("/tokens");
+      }
+    }
+  };
+
+  const fetchAllPlatforms = async () => {
+    const res = await getPlatforms();
+
+    if (res) {
+      setPlatforms(res);
     }
   };
 
   useEffect(() => {
-    if (code) {
+    fetchAllPlatforms();
+  }, []);
+
+  useEffect(() => {
+    if (code && platforms.length > 0) {
       generateFbAccessToken(code);
     }
-  }, [code]);
+  }, [code, platforms]);
 
   return (
     <div>

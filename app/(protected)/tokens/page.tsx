@@ -112,7 +112,8 @@ export default function TokensPage() {
         apiUrl: "https://www.facebook.com/v23.0/dialog/oauth",
         clientId: process.env.NEXT_PUBLIC_APP_ID ?? "",
         redirectUri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI ?? "",
-        scope: "instagram_basic,instagram_manage_insights,pages_show_list",
+        // scope: "instagram_basic,instagram_manage_insights,pages_show_list",
+        scope: "pages_manage_posts,pages_read_engagement,pages_show_list",
         responseType: "code",
       },
     };
