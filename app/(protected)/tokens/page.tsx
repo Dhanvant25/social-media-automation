@@ -135,9 +135,7 @@ export default function TokensPage() {
         params.set("force_reauth", "true");
       }
 
-      console.log("Params======>", platform);
-
-      // window.location.href = `${platform.apiUrl}?${params.toString()}`;
+      window.location.href = `${platform.apiUrl}?${params.toString()}`;
     }
   };
 
