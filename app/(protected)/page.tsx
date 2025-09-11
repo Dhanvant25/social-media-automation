@@ -1,9 +1,14 @@
 "use client"
+import { useEffect } from "react"
 import { PostCreator } from "@/components/post-creator"
 import { RecentPosts } from "@/components/recent-posts"
 import { StatsCards } from "@/components/stats-cards"
 
 export default function Dashboard() {
+  useEffect(() => {
+    console.log("Dashboard Page Loaded...")
+  }, [])
+  
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">

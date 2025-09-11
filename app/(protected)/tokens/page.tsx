@@ -118,7 +118,9 @@ export default function TokensPage() {
       },
     };
 
-    const platformKey = platforms.find((platform) => platform.id == selectedPlatform)?.key;
+    const platformKey = platforms.find(
+      (platform) => platform.id == selectedPlatform
+    )?.key;
     const platform = platformLogic[platformKey as keyof typeof platformLogic];
 
     if (platform) {
@@ -133,7 +135,9 @@ export default function TokensPage() {
         params.set("force_reauth", "true");
       }
 
-      window.location.href = `${platform.apiUrl}?${params.toString()}`;
+      console.log("Params======>", platform);
+
+      // window.location.href = `${platform.apiUrl}?${params.toString()}`;
     }
   };
 
