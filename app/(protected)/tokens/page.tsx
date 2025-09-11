@@ -129,6 +129,10 @@ export default function TokensPage() {
         response_type: platform.responseType,
       });
 
+      if (platformKey == "instagram") {
+        params.set("force_reauth", "true");
+      }
+
       window.location.href = `${platform.apiUrl}?${params.toString()}`;
     }
   };

@@ -53,13 +53,15 @@ export default function InstagramCallbackPage() {
 
     const longLivedToken = longTokenRes.data.access_token;
 
+    console.log("Long Lived Token", longLivedToken);
+
     if (longLivedToken) {
       const platform = platforms.find(
         (platform) => platform.key == "instagram"
       );
       if (platform) {
         saveSocialMediaTokens(platform.id, longLivedToken, null, null, true);
-        router.push("/tokens");
+        // router.push("/tokens");
       }
     }
   };
