@@ -22,7 +22,6 @@ export default function InstagramCallbackPage() {
   const generateIgAccessToken = async (code: string) => {
     const shortTokenRes = await axios.post(
       "https://api.instagram.com/oauth/access_token",
-
       {
         client_id: process.env.NEXT_PUBLIC_IG_APP_ID,
         client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
