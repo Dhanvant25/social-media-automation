@@ -60,7 +60,7 @@ export default function InstagramCallbackPage() {
       );
       if (platform) {
         saveSocialMediaTokens(platform.id, longLivedToken, null, null, true);
-        // router.push("/tokens");
+        router.push("/tokens");
       }
     }
   };
