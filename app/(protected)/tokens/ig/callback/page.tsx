@@ -79,6 +79,8 @@ export default function InstagramCallbackPage() {
   }, []);
 
   useEffect(() => {
+    console.log("Code======>", code);
+    console.log("Platforms========>", platforms);
     if (code && platforms.length > 0) {
       generateIgAccessToken(code);
     }
