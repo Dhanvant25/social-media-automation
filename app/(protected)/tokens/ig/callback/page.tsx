@@ -20,15 +20,18 @@ export default function InstagramCallbackPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const generateIgAccessToken = async (code: string) => {
-    const shortTokenRes = await axios.get(
+    const shortTokenRes = await axios.post(
       "https://api.instagram.com/oauth/access_token",
+      new URLSearchParams({
+        client_id: process.env.IG_APP_ID!,
+        client_secret: process.env.IG_APP_SECRET!,
+        grant_type: "authorization_code",
+        redirect_uri: process.env.IG_REDIRECT_URI!,
+        code,
+      }),
       {
-        params: {
-          client_id: process.env.NEXT_PUBLIC_IG_APP_ID,
-          client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
-          grant_type: "authorization_code",
-          redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI,
-          code,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
