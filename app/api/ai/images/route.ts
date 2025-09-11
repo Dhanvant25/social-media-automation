@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { pool } from "@/lib/db"
 
+export const dynamic = 'force-dynamic' // Force dynamic route behavior
+export const revalidate = 0 // Disable caching
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()
@@ -28,7 +31,7 @@ export async function GET(request: NextRequest) {
       [userId],
     )
 
-    const images = imagesResult.rows.map((row) => ({
+    const images = imagesResult.rows.map((row: { id: string; prompt: string; image_url: string; ai_model?: string; created_at: string | Date }) => ({
       id: row.id,
       prompt: row.prompt,
       imageUrl: row.image_url,

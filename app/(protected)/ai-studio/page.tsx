@@ -347,7 +347,12 @@ export default function AIStudioPage() {
                 <h3 className="text-xl font-semibold text-white mb-2">No Images Generated Yet</h3>
                 <p className="text-purple-300 mb-4">Start creating amazing AI-generated images for your posts</p>
                 <Button
-                  onClick={() => document.querySelector('[value="generate"]')?.click()}
+                  onClick={() => {
+                    const generateButton = document.querySelector('[value="generate"]') as HTMLButtonElement;
+                    if (generateButton) {
+                      generateButton.click();
+                    }
+                  }}
                   className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                 >
                   <Sparkles className="h-4 w-4 mr-2" />

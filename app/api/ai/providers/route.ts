@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { pool } from "@/lib/db"
 
+export const dynamic = 'force-dynamic' // Force dynamic route behavior
+export const revalidate = 0 // Disable caching
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()
@@ -34,22 +37,22 @@ export async function GET(request: NextRequest) {
         id: "dall-e",
         name: "DALL-E 3",
         model: "dall-e",
-        isActive: providersResult.rows.find((p) => p.provider_name === "dall-e")?.is_active || false,
-        hasApiKey: providersResult.rows.find((p) => p.provider_name === "dall-e")?.has_api_key || false,
+        isActive: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "dall-e")?.is_active || false,
+        hasApiKey: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "dall-e")?.has_api_key || false,
       },
       {
         id: "imagen",
         name: "Google Imagen",
         model: "imagen",
-        isActive: providersResult.rows.find((p) => p.provider_name === "imagen")?.is_active || false,
-        hasApiKey: providersResult.rows.find((p) => p.provider_name === "imagen")?.has_api_key || false,
+        isActive: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "imagen")?.is_active || false,
+        hasApiKey: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "imagen")?.has_api_key || false,
       },
       {
         id: "llama",
         name: "LLaMA Vision",
         model: "llama",
-        isActive: providersResult.rows.find((p) => p.provider_name === "llama")?.is_active || false,
-        hasApiKey: providersResult.rows.find((p) => p.provider_name === "llama")?.has_api_key || false,
+        isActive: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "llama")?.is_active || false,
+        hasApiKey: providersResult.rows.find((p: { provider_name: string; is_active: boolean; has_api_key: boolean }) => p.provider_name === "llama")?.has_api_key || false,
       },
     ]
 

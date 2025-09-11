@@ -2,6 +2,9 @@ import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { pool } from "@/lib/db"
 
+export const dynamic = 'force-dynamic' // Force dynamic route behavior
+export const revalidate = 0 // Disable caching
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()

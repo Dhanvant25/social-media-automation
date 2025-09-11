@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { PostPublisher } from "@/lib/post-publisher"
 
+export const dynamic = 'force-dynamic' // Force dynamic route behavior
+export const revalidate = 0 // Disable caching
+
 export async function GET(request: NextRequest) {
   try {
     // Verify cron secret to prevent unauthorized access
