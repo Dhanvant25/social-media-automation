@@ -35,9 +35,21 @@ export default function FacebookCallbackPage() {
     //   }
     // );
 
-    const shortTokenRes = await axios.post("/api/instagram/token", {
-      code,
-    });
+    // const shortTokenRes = await axios.post("/api/instagram/token", {
+    //   code,
+    // });
+
+    const shortTokenRes = await axios.get(
+      "https://graph.facebook.com/v23.0/oauth/access_token",
+      {
+        params: {
+          client_id: process.env.NEXT_PUBLIC_APP_ID!,
+          client_secret: process.env.NEXT_PUBLIC_APP_SECRET!,
+          redirect_uri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI!,
+          code,
+        },
+      }
+    );
 
     const shortLivedToken = shortTokenRes.data.access_token;
 
