@@ -20,33 +20,17 @@ export default function FacebookCallbackPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const generateFbAccessToken = async (code: string) => {
-    // const shortTokenRes = await axios.post(
-    //   "https://graph.facebook.com/v23.0/oauth/access_token",
-    //   {
-    //     client_id: process.env.NEXT_PUBLIC_APP_ID,
-    //     client_secret: process.env.NEXT_PUBLIC_APP_SECRET,
-    //     redirect_uri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI,
-    //     code,
-    //   },
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/x-www-form-urlencoded",
-    //     },
-    //   }
-    // );
-
-    // const shortTokenRes = await axios.post("/api/instagram/token", {
-    //   code,
-    // });
-
-    const shortTokenRes = await axios.get(
+    const shortTokenRes = await axios.post(
       "https://graph.facebook.com/v23.0/oauth/access_token",
       {
-        params: {
-          client_id: process.env.NEXT_PUBLIC_APP_ID!,
-          client_secret: process.env.NEXT_PUBLIC_APP_SECRET!,
-          redirect_uri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI!,
-          code,
+        client_id: process.env.NEXT_PUBLIC_APP_ID,
+        client_secret: process.env.NEXT_PUBLIC_APP_SECRET,
+        redirect_uri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI,
+        code,
+      },
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );

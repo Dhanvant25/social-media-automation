@@ -20,31 +20,38 @@ export default function InstagramCallbackPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const generateIgAccessToken = async (code: string) => {
-    const response = await fetch("https://api.instagram.com/oauth/access_token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        client_id: process.env.NEXT_PUBLIC_IG_APP_ID!,
-        client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET!,
-        grant_type: "authorization_code",
-        redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI!,
-        code,
-      }),
-    });
-    const shortTokenRes = await response.json();
+    // const shortTokenRes = await axios.post(
+    //   "https://api.instagram.com/oauth/access_token",
+    //   {
+    //     client_id: process.env.NEXT_PUBLIC_IG_APP_ID!,
+    //     client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET!,
+    //     grant_type: "authorization_code",
+    //     redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI!,
+    //     code,
+    //   },
+    //   {
+    //     headers: {
+    //       "Content-Type": "application/x-www-form-urlencoded",
+    //     },
+    //   }
+    // );
+    const shortTokenRes = await axios.post(
+      `https://api.instagram.com/oauth/access_token?client_id=${process.env.NEXT_PUBLIC_IG_APP_ID}&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&grant_type=authorization_code&redirect_uri=${process.env.NEXT_PUBLIC_IG_REDIRECT_URI}&code=${code}`,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     const shortLivedToken = shortTokenRes.data.access_token;
     const userId = shortTokenRes.data.user_id;
 
     const longTokenRes = await axios.get(
-      "https://graph.instagram.com/access_token",
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&access_token=${shortLivedToken}`,
       {
-        params: {
-          grant_type: "ig_exchange_token",
-          client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET,
-          access_token: shortLivedToken,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       }
     );
