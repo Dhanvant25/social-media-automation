@@ -25,9 +25,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json(response.data);
   } catch (error: any) {
-    console.error("Instagram Token Error", error.response?.data || error.message);
+    console.error(
+      "Instagram Token Error",
+      error.response?.data || error.message
+    );
     return NextResponse.json(
-      { error: "Failed to get Instagram token" },
+      { error: "Failed to get Instagram token", details: error.response?.data },
       { status: 500 }
     );
   }
