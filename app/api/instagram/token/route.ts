@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     formData.append("grant_type", "authorization_code");
     formData.append(
       "redirect_uri",
-      "https://social-media-automation-d9vjebdmf-dhanvant-sonagaras-projects.vercel.app/tokens/ig/callback"
+      "https://social-media-automation-9vuh459ts-dhanvant-sonagaras-projects.vercel.app/tokens/ig/callback"
     );
     formData.append("code", code);
 
