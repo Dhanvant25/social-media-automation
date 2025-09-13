@@ -101,16 +101,18 @@ export default function TokensPage() {
 
     const platformLogic = {
       instagram: {
-        apiUrl: "https://www.facebook.com/v23.0/dialog/oauth",
+        apiUrl: "https://www.instagram.com/oauth/authorize",
         clientId: process.env.NEXT_PUBLIC_IG_APP_ID ?? "",
         redirectUri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI ?? "",
-        scope: "instagram_basic,pages_show_list,instagram_manage_insights",
+        scope:
+          "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights",
         responseType: "code",
       },
       facebook: {
         apiUrl: "https://www.facebook.com/v23.0/dialog/oauth",
         clientId: process.env.NEXT_PUBLIC_APP_ID ?? "",
         redirectUri: process.env.NEXT_PUBLIC_FB_REDIRECT_URI ?? "",
+        // scope: "instagram_basic,instagram_manage_insights,pages_show_list",
         scope: "pages_manage_posts,pages_read_engagement,pages_show_list",
         responseType: "code",
       },
