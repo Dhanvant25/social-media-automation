@@ -20,60 +20,64 @@ export default function InstagramCallbackPage() {
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
   const generateIgAccessToken = async (code: string) => {
-    // const shortTokenRes = await axios.post(
-    //   "https://api.instagram.com/oauth/access_token",
-    //   {
-    //     client_id: process.env.NEXT_PUBLIC_IG_APP_ID!,
-    //     client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET!,
-    //     grant_type: "authorization_code",
-    //     redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI!,
-    //     code,
-    //   },
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/x-www-form-urlencoded",
-    //     },
-    //   }
-    // );
-    // const shortTokenRes = await axios.post(
-    //   `https://api.instagram.com/oauth/access_token?client_id=${process.env.NEXT_PUBLIC_IG_APP_ID}&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&grant_type=authorization_code&redirect_uri=${process.env.NEXT_PUBLIC_IG_REDIRECT_URI}&code=${code}`,
-    //   {
-    //     headers: {
-    //       "Content-Type": "application/x-www-form-urlencoded",
-    //     },
-    //   }
-    // );
+    try {
+      // const shortTokenRes = await axios.post(
+      //   "https://api.instagram.com/oauth/access_token",
+      //   {
+      //     client_id: process.env.NEXT_PUBLIC_IG_APP_ID!,
+      //     client_secret: process.env.NEXT_PUBLIC_IG_APP_SECRET!,
+      //     grant_type: "authorization_code",
+      //     redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI!,
+      //     code,
+      //   },
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/x-www-form-urlencoded",
+      //     },
+      //   }
+      // );
+      // const shortTokenRes = await axios.post(
+      //   `https://api.instagram.com/oauth/access_token?client_id=${process.env.NEXT_PUBLIC_IG_APP_ID}&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&grant_type=authorization_code&redirect_uri=${process.env.NEXT_PUBLIC_IG_REDIRECT_URI}&code=${code}`,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/x-www-form-urlencoded",
+      //     },
+      //   }
+      // );
 
-    const shortTokenRes = await axios.post("/api/instagram/token", {
-      code,
-    });
+      const shortTokenRes = await axios.post("/api/instagram/token", {
+        code,
+      });
 
-    console.log("Short Token Res", shortTokenRes);
+      console.log("Short Token Res", shortTokenRes);
 
-    const shortLivedToken = shortTokenRes.data.access_token;
-    const userId = shortTokenRes.data.user_id;
+      const shortLivedToken = shortTokenRes.data.access_token;
+      const userId = shortTokenRes.data.user_id;
 
-    const longTokenRes = await axios.get(
-      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&access_token=${shortLivedToken}`,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
-
-    const longLivedToken = longTokenRes.data.access_token;
-
-    console.log("Long Lived Token", longLivedToken);
-
-    if (longLivedToken) {
-      const platform = platforms.find(
-        (platform) => platform.key == "instagram"
+      const longTokenRes = await axios.get(
+        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&access_token=${shortLivedToken}`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
       );
-      if (platform) {
-        saveSocialMediaTokens(platform.id, longLivedToken, null, null, true);
-        router.push("/tokens");
+
+      const longLivedToken = longTokenRes.data.access_token;
+
+      console.log("Long Lived Token", longLivedToken);
+
+      if (longLivedToken) {
+        const platform = platforms.find(
+          (platform) => platform.key == "instagram"
+        );
+        if (platform) {
+          saveSocialMediaTokens(platform.id, longLivedToken, null, null, true);
+          router.push("/tokens");
+        }
       }
+    } catch (error) {
+      console.log("IG Token Generate Error", error);
     }
   };
 
