@@ -6,11 +6,6 @@ export async function POST(req: Request) {
   try {
     const { code } = await req.json();
 
-    console.log("Environment Variables:", {
-      client_id: process.env.NEXT_PUBLIC_IG_APP_ID ? "***" : "MISSING",
-      redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI || "MISSING",
-    });
-
     if (
       !process.env.NEXT_PUBLIC_IG_APP_ID ||
       !process.env.NEXT_PUBLIC_IG_APP_SECRET ||

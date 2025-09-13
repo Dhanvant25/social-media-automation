@@ -49,8 +49,6 @@ export default function InstagramCallbackPage() {
         code,
       });
 
-      console.log("Short Token CODE API", shortTokenRes);
-
       const shortLivedToken = shortTokenRes.data.access_token;
       const userId = shortTokenRes.data.user_id;
 
@@ -65,17 +63,21 @@ export default function InstagramCallbackPage() {
 
       const longLivedToken = longTokenRes.data.access_token;
 
-      console.log("Long Lived Token", longLivedToken);
-
-      // if (longLivedToken) {
-      //   const platform = platforms.find(
-      //     (platform) => platform.key == "instagram"
-      //   );
-      //   if (platform) {
-      //     saveSocialMediaTokens(platform.id, longLivedToken, null, null, true);
-      //     router.push("/tokens");
-      //   }
-      // }
+      if (longLivedToken) {
+        const platform = platforms.find(
+          (platform) => platform.key == "instagram"
+        );
+        if (platform) {
+          saveSocialMediaTokens(
+            platform.id,
+            longLivedToken,
+            null,
+            userId,
+            true
+          );
+          router.push("/tokens");
+        }
+      }
     } catch (error) {
       console.log("IG Token Generate Error", error);
     }
@@ -94,8 +96,6 @@ export default function InstagramCallbackPage() {
   }, []);
 
   useEffect(() => {
-    console.log("Code======>", code);
-    console.log("Platforms========>", platforms);
     if (code && platforms.length > 0) {
       generateIgAccessToken(code);
     }
