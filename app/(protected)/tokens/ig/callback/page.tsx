@@ -51,21 +51,21 @@ export default function InstagramCallbackPage() {
 
       console.log("Short Token CODE API", shortTokenRes);
 
-      // const shortLivedToken = shortTokenRes.data.access_token;
-      // const userId = shortTokenRes.data.user_id;
+      const shortLivedToken = shortTokenRes.data.access_token;
+      const userId = shortTokenRes.data.user_id;
 
-      // const longTokenRes = await axios.get(
-      //   `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&access_token=${shortLivedToken}`,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/x-www-form-urlencoded",
-      //     },
-      //   }
-      // );
+      const longTokenRes = await axios.get(
+        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.NEXT_PUBLIC_IG_APP_SECRET}&access_token=${shortLivedToken}`,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
-      // const longLivedToken = longTokenRes.data.access_token;
+      const longLivedToken = longTokenRes.data.access_token;
 
-      // console.log("Long Lived Token", longLivedToken);
+      console.log("Long Lived Token", longLivedToken);
 
       // if (longLivedToken) {
       //   const platform = platforms.find(
