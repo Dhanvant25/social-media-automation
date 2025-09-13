@@ -6,15 +6,20 @@ export async function POST(req: Request) {
   try {
     const { code } = await req.json();
 
-    console.log(
-      "==========================================CALL MY IG BG API=========================================="
-    );
+    console.log('Environment Variables:', {
+      client_id: process.env.NEXT_PUBLIC_IG_APP_ID ? '***' : 'MISSING',
+      redirect_uri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI || 'MISSING'
+    });
+
+    if (!process.env.NEXT_PUBLIC_IG_APP_ID || !process.env.NEXT_PUBLIC_IG_APP_SECRET || !process.env.NEXT_PUBLIC_IG_REDIRECT_URI) {
+      throw new Error('Missing required environment variables');
+    }
 
     const formData = new URLSearchParams();
-    formData.append("client_id", process.env.NEXT_PUBLIC_IG_APP_ID!);
-    formData.append("client_secret", process.env.NEXT_PUBLIC_IG_APP_SECRET!);
+    formData.append("client_id", process.env.NEXT_PUBLIC_IG_APP_ID);
+    formData.append("client_secret", process.env.NEXT_PUBLIC_IG_APP_SECRET);
     formData.append("grant_type", "authorization_code");
-    formData.append("redirect_uri", process.env.NEXT_PUBLIC_IG_REDIRECT_URI!);
+    formData.append("redirect_uri", process.env.NEXT_PUBLIC_IG_REDIRECT_URI);
     formData.append("code", code);
 
     const response = await axios.post(
