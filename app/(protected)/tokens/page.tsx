@@ -104,12 +104,12 @@ export default function TokensPage() {
         apiUrl: "https://www.instagram.com/oauth/authorize",
         clientId: process.env.NEXT_PUBLIC_IG_APP_ID ?? "",
         redirectUri: process.env.NEXT_PUBLIC_IG_REDIRECT_URI ?? "",
-        // scope:
-        //   "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights",
+        scope:
+          "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights",
         // scope:
         //   "pages_show_list, pages_read_engagement, pages_manage_posts, instagram_basic, instagram_content_publish",
-        scope:
-          "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights,pages_show_list,pages_read_engagement,pages_manage_posts",
+        // scope:
+        //   "instagram_business_basic,instagram_business_manage_messages,instagram_business_manage_comments,instagram_business_content_publish,instagram_business_manage_insights,pages_show_list,pages_read_engagement,pages_manage_posts",
         responseType: "code",
       },
       facebook: {
